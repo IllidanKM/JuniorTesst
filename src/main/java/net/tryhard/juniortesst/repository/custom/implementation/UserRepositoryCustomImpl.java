@@ -1,20 +1,23 @@
 package net.tryhard.juniortesst.repository.custom.implementation;
 
-import jakarta.persistence.EntityManager;
+/*import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Root;*/
 import lombok.RequiredArgsConstructor;
 import net.tryhard.juniortesst.dto.UserDTO;
 import net.tryhard.juniortesst.mapper.UserMapper;
 import net.tryhard.juniortesst.model.User;
 import net.tryhard.juniortesst.repository.custom.UserRepositoryCustom;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
-import jakarta.persistence.PersistenceContext;
+import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import java.time.LocalDate;
 import java.util.List;

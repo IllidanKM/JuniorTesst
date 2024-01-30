@@ -24,12 +24,11 @@ public class UserController {
     }
 
     @GetMapping("/users-filtered")
-    public List<UserDTO> getUsersFiltered(@RequestParam(name = "id", required = false) Long id,
-                                  @RequestParam(name = "firstName", required = false) String firstName,
-                                  @RequestParam(name = "lastName", required = false) String lastName,
-                                  @RequestParam(name = "middleName", required = false) String middleName,
-                                  @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth) {
-        return userService.findAllFiltered(firstName,lastName,middleName,dateOfBirth);
+    public List<UserDTO> getUsersFiltered(@RequestParam(name = "firstName", required = false) String firstName,
+                                          @RequestParam(name = "lastName", required = false) String lastName,
+                                          @RequestParam(name = "middleName", required = false) String middleName,
+                                          @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth) {
+        return userService.findAllFiltered(firstName, lastName, middleName, dateOfBirth);
 
 
     }
