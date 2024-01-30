@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @SpringBootApplication
 @ComponentScan(basePackages ="net.tryhard.juniortesst.mapper" )
 @ComponentScan(basePackages = "net.tryhard.juniortesst.model")
-@ComponentScan(basePackages = "net.tryhard.juniortesst.repository")
+@ComponentScan(basePackages = "net.tryhard.juniortesst.*")
 
 public class  JuniorTesstApplication {
 

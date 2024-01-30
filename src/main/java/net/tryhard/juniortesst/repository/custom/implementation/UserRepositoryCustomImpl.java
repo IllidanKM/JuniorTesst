@@ -11,12 +11,14 @@ import net.tryhard.juniortesst.dto.UserDTO;
 import net.tryhard.juniortesst.mapper.UserMapper;
 import net.tryhard.juniortesst.model.User;
 import net.tryhard.juniortesst.repository.custom.UserRepositoryCustom;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.PersistenceContext;
 
 import java.time.LocalDate;
 import java.util.List;
+
 
 @Repository
 @RequiredArgsConstructor
@@ -31,7 +33,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
         Root<User> root = criteriaQuery.from(User.class);
 
-        Predicate predicate = criteriaBuilder.conjunction(); // Create an empty conjunction
+        Predicate predicate = criteriaBuilder.conjunction();
 
 
         if (lastName != null) {
@@ -48,7 +50,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
             predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("dateOfBirth"), dateOfBirth));
         }
 
-        criteriaQuery.where(predicate); // Apply the dynamic WHERE clause
+        criteriaQuery.where(predicate);
 
         TypedQuery<User> typedQuery = em.createQuery(criteriaQuery);
         List<User> users = typedQuery.getResultList();

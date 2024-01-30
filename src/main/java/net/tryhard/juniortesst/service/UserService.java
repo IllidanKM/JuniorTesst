@@ -21,23 +21,17 @@ import java.util.List;
 public class UserService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
-    private final UserRepositoryCustom userRepositoryCustom;
 
 
     public  List<UserDTO> findAllFiltered( String firstName, String lastName, String middleName, LocalDate dateOfBirth) {
 
-        return userRepositoryCustom.filterTable(firstName,lastName,middleName,dateOfBirth);
+        return userRepository.filterTable(firstName,lastName,middleName,dateOfBirth);
         }
 
-    public List<UserDTO> findAll(int pageNumber, int pageSize) {
-        if (pageSize> 50){
-            pageSize= 50;
-        } else if (pageSize<0) {
-            pageSize = 0;
+    public List<UserDTO> findAll() {
 
-        }
 
-        return userRepository.findAll(PageRequest.of(pageNumber,pageSize))
+        return userRepository.findAll()
                 .stream()
                 .map(userMapper::mapUserDTO)
                 .toList();
@@ -53,6 +47,8 @@ public class UserService {
         User user = userRepository.findById(id).orElse(null);
         user.setFirstName(userDTOUpdate.getFirstName());
         user.setLastName(userDTOUpdate.getLastName());
+        user.setMiddleName(userDTOUpdate.getMiddleName());
+        user.setDateOfBirth(userDTOUpdate.getDateOfBirth());
         return userMapper.mapUserDTO(userRepository.save(user));
     }
 

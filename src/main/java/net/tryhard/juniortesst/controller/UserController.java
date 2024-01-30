@@ -12,12 +12,14 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
+
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/users//{pageNumber}/{pageSize}")
-    public List<UserDTO> findAll(@PathVariable("pageNumber") Integer pageNumber, @PathVariable("pageSize") Integer pageSize) {
-        return userService.findAll(pageNumber, pageSize);
+    @GetMapping("/users")
+    public List<UserDTO> findAll() {
+        return userService.findAll();
 
     }
 
@@ -39,8 +41,8 @@ public class UserController {
     }
 
 
-    @DeleteMapping("user-delete/{id}")
-    public Long deleteUser(@PathVariable("id") Long id) {
+    @DeleteMapping("user-delete")
+    public Long deleteUser(@RequestParam(name = "id") Long id) {
         userService.deleteById(id);
         return id;
     }
