@@ -1,11 +1,6 @@
 package net.tryhard.juniortesst.model;
 
-//import jakarta.persistence.*;
-
 import lombok.Data;
-
-
-//import javax.persistence.*;
 import javax.persistence.*;
 import java.time.LocalDate;
 
@@ -24,4 +19,7 @@ public class User {
     private String middleName;
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
+    @Column(name = "deleted")
+   private boolean deleted = false;
+
 }
