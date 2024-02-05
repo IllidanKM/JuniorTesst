@@ -20,6 +20,6 @@ public class User {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
     @Column(name = "deleted")
-   private boolean deleted = false;
+    private boolean deleted = false;
 
 }

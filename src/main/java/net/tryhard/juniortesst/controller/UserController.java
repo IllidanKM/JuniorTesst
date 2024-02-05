@@ -3,6 +3,7 @@ package net.tryhard.juniortesst.controller;
 import lombok.RequiredArgsConstructor;
 import net.tryhard.juniortesst.dto.UserDTO;
 import net.tryhard.juniortesst.dto.UserDTOCreate;
+import net.tryhard.juniortesst.dto.UserDTOFIltered;
 import net.tryhard.juniortesst.dto.UserDTOUpdate;
 import net.tryhard.juniortesst.service.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -16,17 +17,17 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/users")
-    public List<UserDTO> findAll() {
-        return userService.findAll();
+    public List<UserDTO> findAll( @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                  @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+        return userService.findAll(pageNumber,pageSize);
 
     }
 
     @GetMapping("/users-filtered")
-    public List<UserDTO> getUsersFiltered(@RequestParam(name = "firstName", required = false) String firstName,
-                                          @RequestParam(name = "lastName", required = false) String lastName,
-                                          @RequestParam(name = "middleName", required = false) String middleName,
-                                          @RequestParam(name = "dateOfBirth", required = false) String dateOfBirth) {
-        return userService.searchUsers(firstName, lastName, middleName, dateOfBirth);
+    public List<UserDTO> getUsersFiltered(@ModelAttribute UserDTOFIltered userDTOFIltered,
+                                          @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                          @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+        return userService.searchUsers(userDTOFIltered, pageNumber, pageSize);
     }
 
     @PostMapping("/user-create")

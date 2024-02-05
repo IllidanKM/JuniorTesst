@@ -3,89 +3,69 @@ package net.tryhard.juniortesst.service;
 import lombok.RequiredArgsConstructor;
 import net.tryhard.juniortesst.dto.UserDTO;
 import net.tryhard.juniortesst.dto.UserDTOCreate;
+import net.tryhard.juniortesst.dto.UserDTOFIltered;
 import net.tryhard.juniortesst.dto.UserDTOUpdate;
-import net.tryhard.juniortesst.exception.NotAllParametrsException;
 import net.tryhard.juniortesst.exception.NotFoundException;
 import net.tryhard.juniortesst.mapper.UserMapper;
 import net.tryhard.juniortesst.model.User;
 import net.tryhard.juniortesst.repository.UserDAO;
-import net.tryhard.juniortesst.repository.UserSpecification;
-import org.springframework.data.jpa.domain.Specification;
+import net.tryhard.juniortesst.util.ValidationUtils;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import org.springframework.validation.annotation.Validated;
+
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
+@Validated
 public class UserService {
     private final UserMapper userMapper;
     private final UserDAO userDAO;
+    private final ValidationUtils validationUtils;
 
-
-    public List<UserDTO> searchUsers(String firstName, String lastName, String middleName, String dateOfBirth) {
-        Specification<User> spec = UserSpecification.notDeleted();
-
-        if (lastName != null) {
-            spec = spec.and(UserSpecification.lastNameLike(lastName));
+    public List<UserDTO> searchUsers(UserDTOFIltered userDTOFIltered, Integer pageNumber, Integer pageSize) {
+        if (pageSize > 50) {
+            pageSize = 50;
+        } else if (pageSize < 0) {
+            pageSize = 0;
         }
-
-        if (firstName != null) {
-            spec = spec.and(UserSpecification.firstNameLike(firstName));
-        }
-
-        if (middleName != null) {
-            spec = spec.and(UserSpecification.middleNameLike(middleName));
-        }
-
-        if (dateOfBirth != null) {
-            LocalDate birthDate = LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            spec = spec.and(UserSpecification.dateOfBirthEqual(birthDate));
-        }
-
-        return userDAO.findAll(spec).stream().map(userMapper::mapUserDTO).toList();
+        return userDAO.findFiltered(userDTOFIltered, pageNumber, pageSize)
+                .stream().
+                map(userMapper::mapUserDTO).
+                toList();
     }
 
-    public List<UserDTO> findAll() {
-        return userDAO.findByDeletedFalse()
+    public List<UserDTO> findAll(Integer pageNumber, Integer pageSize) {
+        if (pageSize > 50) {
+            pageSize = 50;
+        } else if (pageSize < 0) {
+            pageSize = 0;
+        }
+        return userDAO.findByDeletedFalse(PageRequest.of(pageNumber, pageSize))
                 .stream()
                 .map(userMapper::mapUserDTO)
                 .toList();
     }
 
     public UserDTO saveUser(UserDTOCreate userDTOCreate) {
-        if (userDTOCreate.getDateOfBirth()== null|| userDTOCreate.getFirstName()== null || userDTOCreate.getLastName() == null || userDTOCreate.getMiddleName() == null ){
-            throw new NotAllParametrsException("To create a user, the following parameters are required: \"firstName\", \"lastName\", \"middleName\", and \"dateOfBirth\".");
-        }
+        validationUtils.validationRequest(userDTOCreate);
         User user = userDAO.save(userMapper.mapUser(userDTOCreate));
         return userMapper.mapUserDTO(user);
 
     }
 
     public UserDTO updateUser(Long id, UserDTOUpdate userDTOUpdate) {
-        User user = userDAO.findById(id).orElseThrow(() -> new NotFoundException("user with id " + id + " not found."));
-        if (user.isDeleted()) {
-            throw new NotFoundException("user with id " + id + " was deleted.");
-        }
-        if (userDTOUpdate.getDateOfBirth()== null|| userDTOUpdate.getFirstName()== null || userDTOUpdate.getLastName() == null || userDTOUpdate.getMiddleName() == null ){
-            throw new NotAllParametrsException("To update a user, the following parameters are required: \"firstName\", \"lastName\", \"middleName\", and \"dateOfBirth\".");
-        }
-        user.setFirstName(userDTOUpdate.getFirstName());
-        user.setLastName(userDTOUpdate.getLastName());
-        user.setMiddleName(userDTOUpdate.getMiddleName());
-        user.setDateOfBirth(userDTOUpdate.getDateOfBirth());
+        User user = userDAO.findByIdAndDeletedFalse(id).orElseThrow(() -> new NotFoundException("user with id " + id + " not found."));
+        validationUtils.validationRequest(userDTOUpdate);
+        userMapper.updateUserFromDto(userDTOUpdate, user);
         return userMapper.mapUserDTO(userDAO.save(user));
     }
 
     public void deleteById(Long id) {
-        Optional<User> optionalUser = userDAO.findById(id);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            user.setDeleted(true);
-            userDAO.save(user);
-        } else {
-            throw new NotFoundException("User with id " + id + " does not exist");
-        }
+        User user = userDAO.findByIdAndDeletedFalse(id).orElseThrow(() -> new NotFoundException("user with id " + id + " not found."));
+        user.setDeleted(true);
+        userDAO.save(user);
     }
 }
